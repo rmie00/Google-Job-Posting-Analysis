@@ -20,16 +20,14 @@ df_clean = load_csv('Cleaned.csv')
 df_skill = load_csv('Skills.csv')
 
 ###Plotly Graph Functions###
-def plot_pie(data, top, title, su=False, ascending=False):
-    if su:
-        x = data.sum().sort_values(ascending).head(top)
-    else:
-        x = data.sort_values(ascending).head(top)
+def plot_pie(top, title, ascending=False):
+    x = df_skill.sum().sort_values(ascending).head(top)
+
     fig = go.Figure(data=[go.Pie(
         values=x[1],
         labels =x[0],
         title=title,
-        pull= [val.max()],
+        pull= [x.max()],
         textinfo= 'label+value',
         textposition= 'inside',
         color_discrete_sequence = px.colors.sequential.Rainbow
@@ -49,5 +47,44 @@ def plot_map():
                                opacity=0.5)
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
     st.plotly_chart(fig, use_container_width=True)
+
+def plot_gauge(prefix = None,freq= False,highest = False, height= 150):
+    if freq:
+        results = df_clean.groupby('company_name')['company_name'].value_counts()
+        comp = results.idxmax()
+        val = results.max()
+        title = 'Most frequent recruiting company'
+    elif highest:
+        results = df_clean.groupby('company_name')['max_yearly'].mean()
+        comp = results.idxmax()
+        val = results.max()
+        title = 'Highest paying company'
+    else:
+        results = df_clean.groupby('company_name')['min_yearly'].mean()
+        comp = results.idxmin()
+        val = results.min()
+        title = 'Lowest paying company'
+
+    colour = 'red' if val< results.mean() else 'green'
+
+    fig = go.Figure(go.Indicator(
+        domain = {'x': [0,1], 'y':[0,1]},
+        value = val,
+        delta = {'reference': results.mean()},
+        title = {'text': f'The {title} is {comp}',
+                 'font': 20},
+        number = {prefix: prefix},
+        mode = 'gauge+number+delta',
+        gauge={'axis':{'range': [0,results.max()]},
+               'bar': {'color': colour},
+               'threshold': {
+                   'line': {'color': 'black', 'width': 4},
+                   'thickness' : 0.75,
+                   'value': val
+               }}))
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},
+                      height = height)
+    st.plotly_chart(fig, use_container_width=True)
+
 
 
