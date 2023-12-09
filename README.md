@@ -7,4 +7,4 @@ I will be doing this on Jupyter Notebooks(Data_Cleaning.ipynb). I will be export
 Data Source = https://www.kaggle.com/datasets/lukebarousse/data-analyst-job-postings-google-search
 
  # Streamlit
- The visulisation is available on https://jobposting.streamlit.app/
+ The visualisation is available on https://jobposting.streamlit.app/
